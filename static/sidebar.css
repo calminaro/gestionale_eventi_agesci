@@ -1,0 +1,34 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+}
+#sidebar {
+    width: 280px;
+    height: 100vh;
+    background-color: #f8f9fa;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+}
+#sidebar2 {
+width: 180px;
+background-color: #f8f9fa;
+top: 0;
+left: 0;
+overflow-y: auto;
+}
+main {
+    margin-left: 280px;
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.material-symbols-outlined {
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    font-size: 20px;
+}
+

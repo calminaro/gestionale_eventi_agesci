@@ -1,0 +1,6 @@
+*.json
+*.conf
+*.db
+__pycache__
+*.csv
+venv

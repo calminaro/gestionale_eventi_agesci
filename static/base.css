@@ -1,0 +1,45 @@
+:root {
+    /* Variabili principali */
+    --bs-primary: #6f42c1;
+    --bs-link-color: #6f42c1;
+    --bs-link-hover-color: #563d7c;
+    --bs-link-active-color: #563d7c;
+}
+
+/* Colori dei pulsanti primari */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--bs-link-hover-color) !important;
+    border-color: var(--bs-link-hover-color) !important;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.show > .btn-primary.dropdown-toggle {
+    background-color: #4b2e83 !important;
+    border-color: #4b2e83 !important;
+}
+
+.dropdown-item:hover,
+.nav-link:hover {
+    color: var(--bs-link-hover-color) !important;
+}
+
+a:active,
+.nav-link:active,
+.dropdown-item:active,
+.nav-link.active,
+.dropdown-item.active {
+color: #fff !important;
+background-color: var(--bs-primary) !important;
+}
+
+.scritta {
+    color: var(--bs-primary);
+}
+
