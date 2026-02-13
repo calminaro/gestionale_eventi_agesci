@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<title>Eventi</title>
+
+{% endblock %}
+
+{% block corpo %}
+<script src="/static/evento.js"></script>
+<h4 class="text-center scritta"><strong>{{ evento.nome }} - {{ evento.tipo }}
+    {% if evento.stato == "PENDING" %}
+        <span class="badge text-bg-warning">IN ATTESA</span>
+    {% elif evento.stato == "ACTIVE" %}
+        <span class="badge text-bg-success">ATTIVO</span>
+    {% elif evento.stato == "SUBMIT" %}
+        <span class="badge text-bg-primary">SOTTOMESSO</span>
+    {% elif evento.stato == "DONE" %}
+        <span class="badge text-bg-secondary">CHIUSO</span>
+    {% endif %}
+</strong></h4>
+<div class="row" x-data="{ anagrafica: true, prima_nota: false, rendiconto: false }">
+    <div class="col-3 d-flex flex-column flex-shrink-0 p-3" style="width: 180px;" x-data="sidebarData()" id="sidebar2">
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+          <a class="nav-link" :class="{ 'active': anagrafica }" @click="anagrafica = true; prima_nota = false; rendiconto = false">
+            <span class="material-symbols-outlined">description</span> Anagrafica
+          </a>
+        </li>
+        <li class="nav-item">
+            <a
+                class="nav-link"
+                :class="{
+                'active': prima_nota,
+                'disabled': '{{ evento.stato }}' === 'PENDING'
+                }"
+                :aria-disabled="'{{ evento.stato }}' === 'PENDING'"
+                href="#"
+                @click.prevent="
+                if ('{{ evento.stato }}' != 'PENDING') {
+                    anagrafica = false;
+                    prima_nota = true;
+                    rendiconto = false;
+                }
+                "
+            >
+            <span class="material-symbols-outlined">point_of_sale</span> Cassa
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="{ 'active': rendiconto }" @click="anagrafica = false; prima_nota = false; rendiconto = true">
+            <span class="material-symbols-outlined">wallet</span> Rendiconto
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col" id="anagrafica" x-show="anagrafica">
+    <form  x-data="anagraficaForm()" @submit.prevent="submitForm" x-init="init()">
+        {% if evento.stato != "DONE" %}
+        <button type="button" class="btn btn-sm btn-primary" @click=submitForm() :disabled="formLoading">AGGIORNA DATI</button>
+        {% endif %}
+        {% if evento.stato == "PENDING" %}
+        <button type="button" class="btn btn-sm btn-success" @click=toActive()>ATTIVA</button>
+        <button type="button" class="btn btn-sm btn-danger" @click=toDelete()>ELIMINA EVENTO</button>
+        {% endif %}
+        {% if evento.stato == "ACTIVE" %}
+        <button type="button" class="btn btn-sm btn-success" @click=toSubmit()>SOTTOMETTI</button>
+        {% endif %}
+        {% if evento.stato == "SUBMIT" %}
+        <button type="button" class="btn btn-sm btn-danger">RIGETTA</button>
+        <button type="button" class="btn btn-sm btn-success">APPROVA</button>
+        {% endif %}
+        <div class="mt-2">
+        <table class="table table-sm table-responsive">
+            <tbody>
+            <tr>
+                <th scope="row"><span class="scritta">Nome Evento</span></th>
+                <td><input type="text" class="form-control" id="nome" x-model="formData.nome_evento"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">Tipo Evento</span></th>
+                <td>
+                    <select class="form-select" id="tipo_evento" x-model="formData.tipo_evento">
+                        <template x-for="i in elenco_tipi" :key="i.id">
+                            <option :value="i.id">
+                                <span x-text="i.nome"></span>
+                            </option>
+                        </template>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">Responsabile Evento</span></th>
+                <td>
+                    <select class="form-select" id="responsabile" x-model="formData.responsabile">
+                        <template x-for="i in elenco_account" :key="i.id">
+                            <option :value="i.id">
+                                <span x-text="i.nome + ' - ' + i.cognome"></span>
+                            </option>
+                        </template>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">Data inizio</span></th>
+                <td><input type="date" class="form-control" id="nome" x-model="formData.data_inizio"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">Data fine</span></th>
+                <td><input type="date" class="form-control" id="nome" x-model="formData.data_fine"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">Località</span></th>
+                <td><input type="text" class="form-control" id="nome" x-model="formData.localita"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">n° iscritti</span></th>
+                <td><input type="number" class="form-control" id="nome" x-model="formData.iscritti"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">n° quote iscrizione pagate alla segreteria</span></th>
+                <td><input type="number" disabled class="form-control" id="nome" x-model="formData.quote_pagate"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">n° partecipanti</span></th>
+                <td><input type="number" class="form-control" id="nome" x-model="formData.partecipanti"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">quota iscrizione (acconto a segreteria)</span></th>
+                <td><input type="text" inputmode="decimal" class="form-control" id="nome" x-model="formData.quota_acconto"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">quota evento (eventuale saldo al campo)</span></th>
+                <td><input type="text" inputmode="decimal" class="form-control" id="nome" x-model="formData.quota_saldo"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">n. componenti staff</span></th>
+                <td><input type="number" class="form-control" id="nome" x-model="formData.staff"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">quota staff</span></th>
+                <td><input type="text" inputmode="decimal" disabled class="form-control" id="nome" x-model="formData.quota_staff"></td>
+            </tr>
+            <tr>
+                <th scope="row"><span class="scritta">IBAN rimborso</span></th>
+                <td><input type="text" class="form-control" id="nome" x-model="formData.iban"></td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+    </form>
+    </div>
+
+    <div class="col" id="prima_nota" x-show="prima_nota" x-data="evento_data_transazione()">
+        {% if evento.stato == "ACTIVE" %}
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#transazioneModal" data-bs-eventoid="">AGGIUNGI OPERAZIONE</button>
+        {% endif %}
+        <button type="button" class="btn btn-sm btn-primary" @click=refreshEventi() id="refresh_eventi"><span class="material-symbols-outlined">refresh</span></button>
+        <table class="table">
+            <thead>
+                <tr>
+                <th scope="col"><span class="scritta">Data</span></th>
+                <th scope="col"><span class="scritta">Tipo Transazione</span></th>
+                <th scope="col"><span class="scritta">Descrizione</span></th>
+                <th scope="col"><span class="scritta">Importo</span></th>
+                <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="i in elenco_transazioni.response.transazioni" :key="i.id">
+                    <tr :class="i.tipo === 'E' ? 'table-success' : (i.tipo === 'U' ? 'table-danger' : '')">
+                        <td x-text="i.data"></td>
+                        <td x-text="i.tipo_transazione"></td>
+                        <td x-text="i.descrizione"></td>
+                        <td x-text="i.importo"></td>
+                        <td>
+                        <a class="btn btn-sm btn-primary" :href="`/evento/${i.id}`"><span class="material-symbols-outlined">edit</span></a>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col" id="rendiconto" x-show="rendiconto" x-data="evento_data_rendiconto()">
+        <button type="button" class="btn btn-sm btn-primary" @click=refreshEventi() id="refresh_eventi"><span class="material-symbols-outlined">refresh</span></button>
+        <template x-if="elenco_transazioni.response.stato == true">
+            <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="col-12">
+                <div class="bg-success text-white fw-bold text-center p-4 rounded shadow">
+                    IL RENDICONTO QUADRA
+                </div>
+                </div>
+            </div>
+            </div>
+        </template>
+        <template x-if="elenco_transazioni.response.stato == false">
+            <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="col-12">
+                <div class="bg-danger text-white fw-bold text-center p-4 rounded shadow">
+                    IL RENDICONTO NON QUADRA
+                </div>
+                </div>
+            </div>
+            </div>
+        </template>
+
+        <div class="row mt-5">
+            <div class="col">
+                <h6 class="text-center scritta"><strong>Entrate</strong></h6>
+                <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col"><span class="scritta">Tipo</span></th>
+                        <th scope="col"><span class="scritta">Importo</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="i in elenco_transazioni.response.transazioni" :key="i.id">
+                            <template x-if="i.tipo == 'E'">
+                            <tr>
+                                <td x-text="i.descrizione"></td>
+                                <td x-text="i.importo"></td>
+                            </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <h6 class="text-center scritta"><strong>Uscite</strong></h6>
+                <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col"><span class="scritta">Tipo</span></th>
+                        <th scope="col"><span class="scritta">Importo</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="i in elenco_transazioni.response.transazioni" :key="i.id">
+                            <template x-if="i.tipo == 'U'">
+                            <tr>
+                                <td x-text="i.descrizione"></td>
+                                <td x-text="i.importo"></td>
+                            </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="col"><span class="scritta">Totale Entrate:</span></td>
+                            <td x-text="elenco_transazioni.response.tot_entrate"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="col"><span class="scritta">Totale Uscite:</span></td>
+                            <td x-text="elenco_transazioni.response.tot_uscite"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="transazioneModal" tabindex="-1" aria-labelledby="transazioneModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h1 class="modal-title fs-5" id="transazioneModalLabel">Operazione</h1>
+        </div>
+        <div class="modal-body mx-2">
+        <form  x-data="transazioneForm()" @submit.prevent="submitForm">
+            <div class="mb-3 row">
+                <div class="col">
+                    <label for="nome" class="form-label">Descrizione</label>
+                    <input type="text" class="form-control" id="descrizione" x-model="formData.descrizione">
+                </div>
+                <div class="col">
+                    <label for="cognome" class="form-label">Tipo Transazione</label>
+                    <select class="form-select" id="tipo_transazione" x-model="formData.tipo_transazione">
+                        <template x-for="i in elenco_tipi" :key="i.id">
+                            <option :value="i.id">
+                                <span x-text="i.descrizione"></span>
+                            </option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col">
+                    <label for="nome" class="form-label">Data</label>
+                    <input type="date" class="form-control" id="data" x-model="formData.data">
+                </div>
+                <div class="col">
+                    <label for="nome" class="form-label">Importo</label>
+                    <input type="text" inputmode="decimal" class="form-control" id="importo" x-model="formData.importo">
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+            <button type="submit" class="btn btn-primary" :disabled="formLoading" data-bs-dismiss="modal">Conferma</button>
+        </form>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+{% endblock %}
