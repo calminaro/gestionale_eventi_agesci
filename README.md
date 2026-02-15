@@ -2,6 +2,6 @@
 
 Gestionale utilizzato per gestire la contabilità degli eventi.
 
-### Scelte implementative
+### Schema DB
 
-Docker...
+<img title="Schema DB" src="./static/schema_db.png" alt="" data-align="center">
