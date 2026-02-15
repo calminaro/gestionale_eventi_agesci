@@ -15,6 +15,7 @@ import base64
 import random
 import json
 import io
+import os
 
 # Operatori per formule
 allowed_operators = {
@@ -24,6 +25,12 @@ allowed_operators = {
     ast.Div: op.truediv,
     ast.Pow: op.pow,
     ast.USub: op.neg,
+}
+
+drivers = {
+    "sqlite": "sqlite:///",
+    "postgresql": "postgresql://",
+    "mariadb": "mysql+pymysql://",
 }
 
 def eval_expr(expr):
@@ -56,30 +63,22 @@ def create_app(test_config=None):
         app.config.update(test_config)
         app.config["SECRET_KEY"] = "test-secret"
     else:
-        config = configparser.ConfigParser()
-        config.read("gestionale.conf")
-        db_type = config.get("Database", "db_type")
-
-        drivers = {
-            "sqlite": "sqlite:///",
-            "postgresql": "postgresql://",
-            "mariadb": "mysql+pymysql://",
-        }
+        db_type = os.environ["DB_TYPE"]
 
         if db_type not in drivers:
             app.logger.info("Tipo di database non supportato")
             raise RuntimeError("Tipo di database non supportato")
 
         if db_type == "sqlite":
-            uri = f"{drivers[db_type]}{config.get('Database', 'db_name')}"
+            uri = f"{drivers[db_type]}{os.environ["DB_NAME"]}"
         else:
             uri = (
                 f"{drivers[db_type]}"
-                f"{config.get('Database', 'db_user')}:"
-                f"{config.get('Database', 'db_password')}@"
-                f"{config.get('Database', 'db_host')}:"
-                f"{config.get('Database', 'db_port')}/"
-                f"{config.get('Database', 'db_name')}"
+                f"{os.environ["DB_USER"]}:"
+                f"{os.environ["DB_PASSWORD"]}@"
+                f"{os.environ["DB_HOST"]}:"
+                f"{os.environ["DB_PORT"]}/"
+                f"{os.environ["DB_NAME"]}"
             )
 
         app.logger.info("DB Configurato con successo")
