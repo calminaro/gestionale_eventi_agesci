@@ -22,19 +22,12 @@ def init_routes(app):
         if current_user.is_authenticated:
             return redirect(url_for("dashboard"))
         return render_template("index.html")
-
+        
     @app.route("/dashboard")
     @login_required
     def dashboard():
-        if "DASHBOARD" in GruppiUser.query.filter_by(id=current_user.gruppo).first().permessi:
-            return render_template("dashboard.html", page="dashboard")
-        return redirect(url_for("index"))
-
-    @app.route("/eventi")
-    @login_required
-    def eventi():
-        if "EVENTS" in GruppiUser.query.filter_by(id=current_user.gruppo).first().permessi:
-            return render_template("eventi.html", page="eventi")
+        if "DASHBOARD" and "EVENTS" in GruppiUser.query.filter_by(id=current_user.gruppo).first().permessi:
+            return render_template("dashboard.html")
         return redirect(url_for("index"))
 
     @app.route("/evento/<evento_id>")
