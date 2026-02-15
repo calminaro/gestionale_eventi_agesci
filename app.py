@@ -74,11 +74,11 @@ def create_app(test_config=None):
         else:
             uri = (
                 f"{drivers[db_type]}"
-                f"{os.environ["DB_USER"]}:"
-                f"{os.environ["DB_PASSWORD"]}@"
-                f"{os.environ["DB_HOST"]}:"
-                f"{os.environ["DB_PORT"]}/"
-                f"{os.environ["DB_NAME"]}"
+                f"{os.environ['DB_USER']}:"
+                f"{os.environ['DB_PASSWORD']}@"
+                f"{os.environ['DB_HOST']}:"
+                f"{os.environ['DB_PORT']}/"
+                f"{os.environ['DB_NAME']}"
             )
 
         app.logger.info("DB Configurato con successo")
