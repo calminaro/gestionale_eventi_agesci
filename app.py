@@ -70,7 +70,7 @@ def create_app(test_config=None):
             raise RuntimeError("Tipo di database non supportato")
 
         if db_type == "sqlite":
-            uri = f"{drivers[db_type]}{os.environ["DB_NAME"]}"
+            uri = f"{drivers[db_type]}{os.environ['DB_NAME']}"
         else:
             uri = (
                 f"{drivers[db_type]}"
