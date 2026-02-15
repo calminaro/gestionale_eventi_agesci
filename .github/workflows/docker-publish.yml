@@ -1,10 +1,10 @@
-name: Docker Image CI
+name: Build Docker Image
 
 on:
   push:
     branches: [ "main" ]
 
-jobs:
+jobs:  
   build:
     runs-on: ubuntu-latest
 
@@ -22,8 +22,10 @@ jobs:
       run: |
         docker build . \
           --file Dockerfile \
-          --tag ghcr.io/calminaro/gestionale_eventi_agesci:${{ github.sha }}
+          --tag ghcr.io/calminaro/gestionale_eventi_agesci:${{ github.sha }} \
+          --tag ghcr.io/calminaro/gestionale_eventi_agesci:latest
 
     - name: Push Docker image
       run: |
         docker push ghcr.io/calminaro/gestionale_eventi_agesci:${{ github.sha }}
+        docker push ghcr.io/calminaro/gestionale_eventi_agesci:latest
