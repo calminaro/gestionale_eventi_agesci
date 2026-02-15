@@ -10,7 +10,11 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <title>Impostazioni</title>
   </head>
-  <body class="m-2" x-data="{ sys_op: true, utenze: false, eventi: false }">
+  <body class="m-2" x-data="{ route: window.location.hash.substring(1) || 'sys_op' }" x-init="
+    window.addEventListener('hashchange', () => {
+      route = location.hash.substring(1)
+    })
+  ">
     <script src="/static/sidebar.js"></script>
     <script src="/static/impostazioni.js"></script>
     <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 280px;" x-data="sidebarData()" id="sidebar">
@@ -20,17 +24,17 @@
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-          <a class="nav-link" :class="{ 'active': sys_op }" @click="sys_op = true; utenze = false; eventi = false">
+          <a class="nav-link" :class="{ 'active': route === 'sys_op' }" href="#sys_op">
             <span class="material-symbols-outlined">dns</span> System Option
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" :class="{ 'active': utenze }" @click="sys_op = false; utenze = true; eventi = false">
+          <a class="nav-link" :class="{ 'active': route === 'utenze' }" href="#utenze">
             <span class="material-symbols-outlined">group</span> Utenze e Gruppi
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" :class="{ 'active': eventi }" @click="sys_op = false; utenze = false; eventi = true">
+          <a class="nav-link" :class="{ 'active': route === 'eventi' }" href="#eventi">
             <span class="material-symbols-outlined">festival</span> Tipi Eventi
           </a>
         </li>
@@ -42,7 +46,7 @@
 
 <main>
 
-<div id="sys_op" x-show="sys_op">
+<div id="sys_op" x-show="route === 'sys_op'">
   <form  x-data="system_optionForm()" @submit.prevent="submitForm" x-init="loadData()">
     <button type="button" class="btn btn-sm btn-primary" @click=loadData() id="refresh_sys"><span class="material-symbols-outlined">refresh</span></button>
     <button type="button" class="btn btn-sm btn-primary" @click=submitForm() id="upgrade_sys" :disabled="formLoading"><span class="material-symbols-outlined">upgrade</span></button>
@@ -83,11 +87,11 @@
   </form>
 </div>
 
-<div id="utenze" x-show="utenze">
+<div id="utenze" x-show="route === 'utenze'">
   <h4 class="text-center">Utenze e Gruppi</h4>
 </div>
 
-<div id="eventi" x-show="eventi" x-data="tipi_eventi()">
+<div id="eventi" x-show="route === 'eventi'" x-data="tipi_eventi()">
   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#tipiModal" data-bs-paraid="">Aggiungi</button>
   <button type="button" class="btn btn-sm btn-primary" @click=refreshEventi() id="refresh_eventi"><span class="material-symbols-outlined">refresh</span></button>
   <table class="table table-responsive">

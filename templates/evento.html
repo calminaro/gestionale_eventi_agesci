@@ -19,11 +19,15 @@
         <span class="badge text-bg-secondary">CHIUSO</span>
     {% endif %}
 </strong></h4>
-<div class="row" x-data="{ anagrafica: true, prima_nota: false, rendiconto: false }">
+<div class="row" x-data="{ route: window.location.hash.substring(1) || 'anagrafica' }" x-init="
+    window.addEventListener('hashchange', () => {
+      route = location.hash.substring(1)
+    })
+  ">
     <div class="col-3 d-flex flex-column flex-shrink-0 p-3" style="width: 180px;" x-data="sidebarData()" id="sidebar2">
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-          <a class="nav-link" :class="{ 'active': anagrafica }" @click="anagrafica = true; prima_nota = false; rendiconto = false">
+          <a class="nav-link" :class="{ 'active': route === 'anagrafica' }" href="#anagrafica">
             <span class="material-symbols-outlined">description</span> Anagrafica
           </a>
         </li>
@@ -31,31 +35,24 @@
             <a
                 class="nav-link"
                 :class="{
-                'active': prima_nota,
+                'active': route === 'prima_nota',
                 'disabled': '{{ evento.stato }}' === 'PENDING'
                 }"
                 :aria-disabled="'{{ evento.stato }}' === 'PENDING'"
-                href="#"
-                @click.prevent="
-                if ('{{ evento.stato }}' != 'PENDING') {
-                    anagrafica = false;
-                    prima_nota = true;
-                    rendiconto = false;
-                }
-                "
+                href="#prima_nota"
             >
             <span class="material-symbols-outlined">point_of_sale</span> Cassa
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" :class="{ 'active': rendiconto }" @click="anagrafica = false; prima_nota = false; rendiconto = true">
+          <a class="nav-link" :class="{ 'active': route === 'rendiconto' }" href="#rendiconto">
             <span class="material-symbols-outlined">wallet</span> Rendiconto
           </a>
         </li>
       </ul>
     </div>
 
-    <div class="col" id="anagrafica" x-show="anagrafica">
+    <div class="col" id="anagrafica" x-show="route === 'anagrafica'">
     <form  x-data="anagraficaForm()" @submit.prevent="submitForm" x-init="init()">
         {% if evento.stato != "DONE" %}
         <button type="button" class="btn btn-sm btn-primary" @click=submitForm() :disabled="formLoading">AGGIORNA DATI</button>
@@ -152,7 +149,7 @@
     </form>
     </div>
 
-    <div class="col" id="prima_nota" x-show="prima_nota" x-data="evento_data_transazione()">
+    <div class="col" id="prima_nota" x-show="route === 'prima_nota'" x-data="evento_data_transazione()">
         {% if evento.stato == "ACTIVE" %}
         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#transazioneModal" data-bs-eventoid="">AGGIUNGI OPERAZIONE</button>
         {% endif %}
@@ -183,7 +180,7 @@
         </table>
     </div>
 
-    <div class="col" id="rendiconto" x-show="rendiconto" x-data="evento_data_rendiconto()">
+    <div class="col" id="rendiconto" x-show="route === 'rendiconto'" x-data="evento_data_rendiconto()">
         <button type="button" class="btn btn-sm btn-primary" @click=refreshEventi() id="refresh_eventi"><span class="material-symbols-outlined">refresh</span></button>
         <template x-if="elenco_transazioni.response.stato == true">
             <div class="container-fluid mt-3">

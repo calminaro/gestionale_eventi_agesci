@@ -11,7 +11,11 @@
     {% block head %}
     {% endblock %}
   </head>
-  <body class="m-2">
+  <body class="m-2" x-data="{ route: window.location.hash.substring(1) || '', isDashboard: window.location.pathname === '/dashboard' }" x-init="
+    window.addEventListener('hashchange', () => {
+      route = location.hash.substring(1)
+    })
+  ">
     <script src="/static/sidebar.js"></script>
     <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 280px;" x-data="sidebarData()" id="sidebar">
       <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none scritta">
@@ -20,20 +24,12 @@
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-          {% if page == "dashboard" %}
-          <a href="{{ url_for("dashboard") }}" class="nav-link active">
-          {% else %}
-          <a href="{{ url_for("dashboard") }}" class="nav-link">
-          {% endif %}
+          <a class="nav-link" :class="{ 'active': route === '' && isDashboard }" :href="isDashboard ? '#' : '/dashboard#'">
             <span class="material-symbols-outlined">bar_chart_4_bars</span> Dashboard
           </a>
         </li>
         <li class="nav-item">
-          {% if page == "eventi" %}
-          <a href="{{ url_for("eventi") }}" class="nav-link active">
-          {% else %}
-          <a href="{{ url_for("eventi") }}" class="nav-link">
-          {% endif %}
+          <a class="nav-link" :class="{ 'active': route === 'eventi' || !isDashboard }" :href="isDashboard ? '#eventi' : '/dashboard#eventi'">
             <span class="material-symbols-outlined">event_list</span> Eventi
           </a>
         </li>
