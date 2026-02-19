@@ -10,6 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
+      SECRET_KEY: "secret"
       DB_TYPE: "sqlite"
       DB_USER: ""
       DB_PASSWORD: ""
