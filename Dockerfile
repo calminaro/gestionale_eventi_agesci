@@ -4,10 +4,12 @@ WORKDIR /gestionale_eventi
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./app.py ./app.py
+COPY ./models.py ./models.py
+COPY ./routes.py ./routes.py
 COPY ./templates ./templates
 COPY ./static ./static
 
-CMD ["gunicorn",  "-w 3", "-b 0.0.0.0",  "app:app"]
+CMD ["gunicorn",  "-w 3", "-b 0.0.0.0:8000",  "app:app"]
