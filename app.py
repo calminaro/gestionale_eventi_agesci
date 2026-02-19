@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, jsonify, request, url_for, flash, send_from_directory, send_file
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.attributes import flag_modified
@@ -83,7 +84,8 @@ def create_app(test_config=None):
 
         app.logger.info("DB Configurato con successo")
         app.config["SQLALCHEMY_DATABASE_URI"] =  uri
-        app.config["SECRET_KEY"] = secrets.token_hex()
+        app.config["SECRET_KEY"] = os.environ['SECRET_KEY']
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     db.init_app(app)
     login_manager.init_app(app)
@@ -97,8 +99,12 @@ app = create_app()
 
 @app.cli.command("init-db")
 def init_db():
+    password = generate_password_hash("admin")
     db.create_all()
     db.session.add(GruppiUser(name="admin", permessi=["MY_EVENTS","ALL_EVENTS","DASHBOARD","EVENTS","SETTINGS","ACCOUNT"]))
+    db.session.commit()
+    gruppo = GruppiUser.query.filter_by(name="admin").first()
+    db.session.add(User(username="admin", password=password, nome="Nome", cognome="Cognome", mail="mail@esempio.it", gruppo=gruppo.id))
 
     db.session.add(SysOption(key="id_ente", value="Nome Ente"))
     db.session.add(SysOption(key="nome_iro", value="Nome"))

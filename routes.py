@@ -17,8 +17,6 @@ import io
 def init_routes(app):
     @app.route("/")
     def index():
-        if len(User.query.all()) == 0:
-            return redirect(url_for("welcome"))
         if current_user.is_authenticated:
             return redirect(url_for("dashboard"))
         return render_template("index.html")
@@ -322,29 +320,6 @@ def init_routes(app):
             else:
                 return jsonify({"status": "success", "response": "invalid"})
         return jsonify({"status": "success", "response": "error"})
-
-    @app.route("/welcome", methods=["GET", "POST"])
-    def welcome():
-        if len(User.query.all()) > 0:
-            return redirect(url_for("index"))
-        if request.method == "POST":
-            if request.form["passwd"] != request.form["conferma_passwd"]:
-                return render_template("welcome.html")
-            password = generate_password_hash(request.form["passwd"])
-            gruppo = GruppiUser.query.filter_by(name="admin").first()
-            utente = User(username=request.form["username"], password=password, nome=request.form["nome_iro"], cognome=request.form["cognome_iro"], mail=request.form["mail"], gruppo=gruppo.id)
-            db.session.add(utente)
-            app.logger.info("Creato utente %s del gruppo %s", utente.username, "admin")
-            SysOption.query.filter_by(key="id_ente").first().value=request.form["id_ente"]
-            SysOption.query.filter_by(key="nome_iro").first().value=request.form["nome_iro"]
-            SysOption.query.filter_by(key="cognome_iro").first().value=request.form["cognome_iro"]
-            SysOption.query.filter_by(key="smtp_server").first().value="smtp.gmail.com"
-            SysOption.query.filter_by(key="smtp_port").first().value=587
-            SysOption.query.filter_by(key="mail_indirizzo").first().value="mail@esempio.it"
-            SysOption.query.filter_by(key="mail_passwd").first().value="PASSWORD"
-            db.session.commit()
-            return redirect(url_for("index"))
-        return render_template("welcome.html")
 
     @app.route("/logout")
     @login_required
