@@ -7,7 +7,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.attributes import flag_modified
 from datetime import datetime
 from decimal import Decimal
-import ast, operator as op
 import configparser
 import requests
 import secrets
@@ -18,40 +17,12 @@ import json
 import io
 import os
 
-# Operatori per formule
-allowed_operators = {
-    ast.Add: op.add,
-    ast.Sub: op.sub,
-    ast.Mult: op.mul,
-    ast.Div: op.truediv,
-    ast.Pow: op.pow,
-    ast.USub: op.neg,
-}
 
 drivers = {
     "sqlite": "sqlite:///",
     "postgresql": "postgresql://",
     "mariadb": "mysql+pymysql://",
 }
-
-def eval_expr(expr):
-    node = ast.parse(expr, mode='eval').body
-
-    def _eval(node):
-        if isinstance(node, ast.Constant):
-            return node.value
-        elif isinstance(node, ast.BinOp):
-            return allowed_operators[type(node.op)](_eval(node.left), _eval(node.right))
-        elif isinstance(node, ast.UnaryOp):
-            return allowed_operators[type(node.op)](_eval(node.operand))
-        else:
-            raise ValueError(f"Operatore non consentito: {node}")
-    return _eval(node)
-
-def calcola_formula(formula, variabili):
-    for nome, valore in variabili.items():
-        formula = formula.replace(f"[[{nome}]]", str(valore))
-    return eval_expr(formula)
 
 # Inizializza app e servizi
 db = SQLAlchemy()

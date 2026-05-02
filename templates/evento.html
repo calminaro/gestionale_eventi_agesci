@@ -207,12 +207,16 @@
 
         <div class="row mt-5">
             <div class="col">
-                <h6 class="text-center scritta"><strong>Entrate</strong></h6>
+                <h4 class="text-center scritta"><strong>Entrate</strong></h4>
                 <table class="table">
                     <thead>
                         <tr>
                         <th scope="col"><span class="scritta">Tipo</span></th>
                         <th scope="col"><span class="scritta">Importo</span></th>
+                        </tr>
+                        <tr>
+                            <th scope="col"><span class="scritta">Totale Entrate:</span></td>
+                            <th scope="col"><span class="scritta" x-text="elenco_transazioni.response.tot_entrate"></span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -228,12 +232,16 @@
                 </table>
             </div>
             <div class="col">
-                <h6 class="text-center scritta"><strong>Uscite</strong></h6>
+                <h4 class="text-center scritta"><strong>Uscite</strong></h4>
                 <table class="table">
                     <thead>
                         <tr>
                         <th scope="col"><span class="scritta">Tipo</span></th>
                         <th scope="col"><span class="scritta">Importo</span></th>
+                        </tr>
+                        <tr>
+                            <th scope="col"><span class="scritta">Totale Uscite:</span></td>
+                            <th scope="col"><span class="scritta" x-text="elenco_transazioni.response.tot_uscite"></span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -245,29 +253,6 @@
                             </tr>
                             </template>
                         </template>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th scope="col"><span class="scritta">Totale Entrate:</span></td>
-                            <td x-text="elenco_transazioni.response.tot_entrate"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th scope="col"><span class="scritta">Totale Uscite:</span></td>
-                            <td x-text="elenco_transazioni.response.tot_uscite"></td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
