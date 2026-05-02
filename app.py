@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from sqlalchemy.orm.attributes import flag_modified
 from datetime import datetime
 from decimal import Decimal
@@ -26,6 +27,7 @@ drivers = {
 
 # Inizializza app e servizi
 db = SQLAlchemy()
+migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = "index"
 
@@ -59,6 +61,7 @@ def create_app(test_config=None):
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     db.init_app(app)
+    migrate.init_app(app, db) 
     login_manager.init_app(app)
     from routes import init_routes
     init_routes(app)

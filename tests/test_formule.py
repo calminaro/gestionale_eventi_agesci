@@ -1,4 +1,4 @@
-from app import eval_expr, calcola_formula
+from routes import eval_expr, calcola_formula
 
 def test_eval_expr_ok():
     assert eval_expr("2+3*4") == 14
