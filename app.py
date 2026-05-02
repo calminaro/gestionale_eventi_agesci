@@ -74,7 +74,6 @@ app = create_app()
 @app.cli.command("init-db")
 def init_db():
     password = generate_password_hash("admin")
-    db.create_all()
     db.session.add(GruppiUser(name="admin", permessi=["MY_EVENTS","ALL_EVENTS","DASHBOARD","EVENTS","SETTINGS","ACCOUNT"]))
     db.session.commit()
     gruppo = GruppiUser.query.filter_by(name="admin").first()
