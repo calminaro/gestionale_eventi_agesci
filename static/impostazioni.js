@@ -84,7 +84,7 @@ function tipiEventiForm() {
                         fetch(`/tipi_eventi/${id_tipo}`)
                         .then(response => response.json())
                         .then(data => {
-                            this.formData.tipo_id = id_para;
+                            this.formData.tipo_id = data.response.id;
                             this.formData.nome = data.response.nome;
                         });
                     }

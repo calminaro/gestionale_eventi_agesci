@@ -90,7 +90,7 @@ def init_routes(app):
     @login_required
     def eventi_list():
         if request.method == "POST":
-            evento = Evento(nome=request.json["nome"], tipo=request.json["tipo_evento"], responsabile=request.json["account_responsabile"], stato="PENDING", data_inizio=datetime.today().date(), localita="ignota", iscritti=0, partecipanti=0, quota_acconto=0, quota_saldo=0, staff=1)
+            evento = Evento(nome=request.json["nome"], tipo=request.json["tipo_evento"], responsabile=request.json["account_responsabile"], stato="PENDING", data_inizio=datetime.today().date(), localita="ignota", iscritti=0, partecipanti=0, quota_acconto=0, quota_saldo=0, staff=1, iban="")
             db.session.add(evento)
             db.session.commit()
             return jsonify({"status": "success", "response": "ok"})
@@ -142,7 +142,10 @@ def init_routes(app):
                 evento.tipo = request.json["tipo_evento"]
                 evento.responsabile = request.json["responsabile"]
                 evento.data_inizio = datetime.strptime(request.json["data_inizio"], "%Y-%m-%d")
-                evento.data_fine = datetime.strptime(request.json["data_fine"], "%Y-%m-%d")
+                try:
+                    evento.data_fine = datetime.strptime(request.json["data_fine"], "%Y-%m-%d")
+                except:
+                    evento.data_fine = evento.data_inizio
                 evento.localita = request.json["localita"]
                 evento.iscritti = int(request.json["iscritti"])
                 evento.partecipanti = int(request.json["partecipanti"])
@@ -262,6 +265,9 @@ def init_routes(app):
             SysOption.query.filter_by(key="smtp_port")[0].value = int(request.json["smtp_port"])
             SysOption.query.filter_by(key="mail_indirizzo")[0].value = request.json["mail_indirizzo"]
             SysOption.query.filter_by(key="mail_passwd")[0].value = request.json["mail_passwd"]
+            admin_user = User.query.filter_by(id=1).first()
+            admin_user.nome = request.json["nome_iro"]
+            admin_user.cognome = request.json["cognome_iro"]
             db.session.commit()
         tmp_sysop = SysOption.query.all()
         elenco_sysop = {}
@@ -320,6 +326,9 @@ def init_routes(app):
         if request.method == "DELETE":
             return jsonify({"status": "success", "response": "ok"})
         if request.method == "POST":
+            if request.json["tipo_id"] == "":
+                db.session.add(TipoEvento(nome=request.json["nome"]))
+                db.session.commit()
             return jsonify({"status": "success", "response": "ok"})
         tmp_eventi = TipoEvento.query.all()
         elenco_tipi = []
