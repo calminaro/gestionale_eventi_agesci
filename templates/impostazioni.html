@@ -119,14 +119,20 @@
 
 </main>
 
-    <div class="modal fade" id="tipiModal" tabindex="-1" aria-labelledby="tipiModalLabel" aria-hidden="true">
+    <div class="modal fade" id="tipiModal" tabindex="-1" aria-labelledby="tipiModalLabel" aria-hidden="true"
+     x-data="tipiEventiForm()"
+     x-init="
+        $el.addEventListener('show.bs.modal', event => {
+            loadData(event.relatedTarget.dataset.bsTipoid)
+        })
+     ">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="tipiModalLabel">Tipo Evento</h1>
           </div>
           <div class="modal-body mx-2">
-            <form  x-data="tipiEventiForm()" @submit.prevent="submitForm">
+            <form @submit.prevent="submitForm">
               <input type="text" class="form-control" hidden id="tipo_id" x-model="formData.tipo_id">
               <div class="mb-3 row">
                   <label for="nome" class="form-label">Nome</label>

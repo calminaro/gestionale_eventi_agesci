@@ -50,7 +50,7 @@ def init_routes(app):
         if current_user.is_authenticated:
             return redirect(url_for("dashboard"))
         return render_template("index.html")
-        
+
     @app.route("/dashboard")
     @login_required
     def dashboard():
@@ -95,7 +95,11 @@ def init_routes(app):
             db.session.commit()
             return jsonify({"status": "success", "response": "ok"})
         elenco_eventi = []
-        tmp_eventi = Evento.query.all()
+        tmp_eventi = []
+        if "MY_EVENTS" in GruppiUser.query.filter_by(id=current_user.gruppo).first().permessi:
+            tmp_eventi = Evento.query.filter_by(responsabile=current_user.id)
+        if "ALL_EVENTS" in GruppiUser.query.filter_by(id=current_user.gruppo).first().permessi:
+            tmp_eventi = Evento.query.all()
         for i in tmp_eventi:
             tmp_responsabile = User.query.filter_by(id=i.responsabile).first()
             tmp_tipo = TipoEvento.query.filter_by(id=i.tipo).first()
@@ -113,13 +117,15 @@ def init_routes(app):
     @login_required
     def evento_edit(evento_id):
         richiesta = request.args.get("tipo")
-        print(richiesta)
         if request.method == "DELETE":
             if richiesta == "elimina":
                 evento = Evento.query.filter_by(id=int(evento_id)).first()
-                db.session.delete(evento)
-                db.session.commit()
-                return jsonify({"status": "success", "response": "ok"})
+                if evento.stato == "PENDING":
+                    db.session.delete(evento)
+                    db.session.commit()
+                    return jsonify({"status": "success", "response": "ok"})
+                else:
+                    return jsonify({"status": "error", "response": "evento già attivo!"})
         if request.method == "POST":
             if richiesta == "attiva":
                 evento = Evento.query.filter_by(id=int(evento_id)).first()
@@ -320,9 +326,10 @@ def init_routes(app):
             elenco_tipi.append(evento)
         return jsonify({"status": "success", "response": elenco_tipi})
 
-    @app.route("/tipi_eventi", methods=["GET", "POST", "DELETE"])
+    @app.route("/tipi_eventi", defaults={"id_tipo": None}, methods=["GET", "POST"])
+    @app.route("/tipi_eventi/<int:id_tipo>", methods=["GET", "POST", "DELETE"])
     @login_required
-    def tipi_eventi():
+    def tipi_eventi(id_tipo):
         if request.method == "DELETE":
             return jsonify({"status": "success", "response": "ok"})
         if request.method == "POST":
@@ -330,6 +337,9 @@ def init_routes(app):
                 db.session.add(TipoEvento(nome=request.json["nome"]))
                 db.session.commit()
             return jsonify({"status": "success", "response": "ok"})
+        if id_tipo:
+            tmp_evento = TipoEvento.query.filter_by(id=id_tipo).first()
+            return jsonify({"status": "success", "response": {"id": tmp_evento.id, "nome": tmp_evento.nome}})
         tmp_eventi = TipoEvento.query.all()
         elenco_tipi = []
         for i in tmp_eventi:

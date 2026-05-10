@@ -72,49 +72,49 @@ function tipiEventiForm() {
             nome: "",
         },
         formMessage: "",
-            formLoading: false,
-                init() {
-                    this.loadData();
-                },
-                loadData(id_tipo) {
-                    if (!id_tipo) {
-                        this.formData.tipo_id = "";
-                        this.formData.nome = "";
-                    } else {
-                        fetch(`/tipi_eventi/${id_tipo}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            this.formData.tipo_id = data.response.id;
-                            this.formData.nome = data.response.nome;
-                        });
-                    }
-                },
-                submitForm() {
-                    this.formMessage = "";
-                    this.formLoading = true;
-                    fetch("/tipi_eventi", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                        },
-                        body: JSON.stringify(this.formData),
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then((data) => {
-                        if (data.response == "ok") {
-                            document.getElementById("refresh_eventi").click();
-                        }
-                    })
-                    .finally(() => {
-                        this.formLoading = false;
+        formLoading: false,
+            init() {
+                this.loadData();
+            },
+            loadData(id_tipo) {
+                if (!id_tipo) {
+                    this.formData.tipo_id = "";
+                    this.formData.nome = "";
+                } else {
+                    fetch(`/tipi_eventi/${id_tipo}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.formData.tipo_id = data.response.id;
+                        this.formData.nome = data.response.nome;
                     });
-                },
+                }
+            },
+            submitForm() {
+                this.formMessage = "";
+                this.formLoading = true;
+                fetch("/tipi_eventi", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify(this.formData),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.response == "ok") {
+                        document.getElementById("refresh_eventi").click();
+                    }
+                })
+                .finally(() => {
+                    this.formLoading = false;
+                });
+            },
     };
 }
 
