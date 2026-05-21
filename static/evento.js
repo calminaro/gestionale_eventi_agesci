@@ -217,6 +217,21 @@ function transazioneForm() {
             this.elenco_tipi = await response.json();
             this.elenco_tipi = this.elenco_tipi.response;
         },
+        loadData(id_tipo) {
+            if (!id_tipo) {
+                this.formData.descrizione = "";
+                this.formData.tipo_transazione = "";
+                this.formData.data = "";
+                this.formData.import = "";
+            } else {
+                fetch(`/transazioni/${id_tipo}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.formData.descrizione = data.response.id;
+                    this.formData.nome = data.response.nome;
+                });
+            }
+        },
         submitForm() {
             this.formMessage = "";
             this.formLoading = true;
