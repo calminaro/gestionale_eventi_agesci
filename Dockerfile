@@ -12,5 +12,8 @@ COPY ./routes.py ./routes.py
 COPY ./templates ./templates
 COPY ./static ./static
 COPY ./migrations ./migrations
+COPY ./entrypoint.sh ./entrypoint.sh
 
-CMD ["gunicorn",  "-w 3", "-b 0.0.0.0:8000",  "app:app"]
+RUN chmod +x ./entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
