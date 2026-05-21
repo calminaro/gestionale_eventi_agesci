@@ -198,7 +198,7 @@ function transazioneForm() {
             descrizione: "",
             tipo_transazione: 1,
             data: "",
-            import: 0,
+            importo: 0,
         },
         elenco_tipi: [],
         formMessage: "",
@@ -222,7 +222,7 @@ function transazioneForm() {
                 this.formData.descrizione = "";
                 this.formData.tipo_transazione = "";
                 this.formData.data = "";
-                this.formData.import = "";
+                this.formData.importo = "";
             } else {
                 fetch(`/transazioni/${id_tipo}`)
                 .then(response => response.json())
