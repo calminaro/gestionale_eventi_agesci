@@ -12,3 +12,9 @@ def test_calcola_formula():
     formula = "[[a]]+[[b]]*2"
     variabili = {"a": 10, "b": 3}
     assert calcola_formula(formula, variabili) == 16
+
+def test_calcola_formula_variabili_ripetute_con_prefisso_comune():
+    formula = "([[quota]] + [[quota_saldo]]) * [[partecipanti]] - [[quota]]"
+    variabili = {"quota": 12.5, "quota_saldo": 7.5, "partecipanti": 3}
+
+    assert calcola_formula(formula, variabili) == 47.5
