@@ -12,3 +12,9 @@ def test_calcola_formula():
     formula = "[[a]]+[[b]]*2"
     variabili = {"a": 10, "b": 3}
     assert calcola_formula(formula, variabili) == 16
+
+def test_calcola_formula_con_nomi_simili_e_segnaposto_ripetuto():
+    formula = "([[quota]] - [[quota_acconto]]) * [[partecipanti]] + [[quota_acconto]]"
+    variabili = {"quota": 25.5, "quota_acconto": 5.5, "partecipanti": 3}
+
+    assert calcola_formula(formula, variabili) == 65.5
